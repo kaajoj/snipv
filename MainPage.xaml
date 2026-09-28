@@ -1,0 +1,193 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:snipv.ViewModels"
+             x:Class="snipv.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="snipv"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <!-- The template's default button is 44pt tall and stretches across the
+             window; these are sized to their text instead. -->
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="OpenSansRegular" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="BorderWidth" Value="0" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="HeightRequest" Value="34" />
+            <Setter Property="MinimumHeightRequest" Value="0" />
+            <Setter Property="MinimumWidthRequest" Value="0" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource PrimaryDarkText}}" />
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray500}}" />
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style x:Key="QuietButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}" />
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}" />
+        </Style>
+
+        <Color x:Key="MutedText">#707070</Color>
+        <Color x:Key="MutedTextDark">#9E9E9E</Color>
+
+        <!-- A shade apart from the page background, so an empty input still
+             reads as a place to type. Gray900 sits too close to it. -->
+        <Color x:Key="FieldFill">#FFFFFF</Color>
+        <Color x:Key="FieldFillDark">#2D2D2D</Color>
+
+        <!-- Readable against both grounds without shouting like an error would. -->
+        <Color x:Key="WarningText">#B45309</Color>
+        <Color x:Key="WarningTextDark">#F0B457</Color>
+    </ContentPage.Resources>
+
+    <Grid Padding="16,12,16,14" RowSpacing="8" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
+        <HorizontalStackLayout Grid.Row="0" Spacing="8" Margin="2,0,0,2">
+            <Label Text="snipv"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="19"
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+            <Label Text="paste snippets anywhere with a global shortcut"
+                   FontSize="12"
+                   VerticalOptions="End"
+                   Margin="0,0,0,3"
+                   TextColor="{AppThemeBinding Light={StaticResource MutedText}, Dark={StaticResource MutedTextDark}}" />
+        </HorizontalStackLayout>
+
+        <!-- The template leaves both inputs transparent, which on Windows makes
+             them blend into the page. Filling them in is enough to set them
+             apart - the control draws its own border and focus underline. -->
+        <Editor Grid.Row="1"
+                Text="{Binding NewSnippet}"
+                HeightRequest="96"
+                BackgroundColor="{AppThemeBinding Light={StaticResource FieldFill}, Dark={StaticResource FieldFillDark}}"
+                Placeholder="Enter your snippet here (multiple lines allowed)..." />
+
+        <Grid Grid.Row="2" ColumnSpacing="8" ColumnDefinitions="*,Auto">
+            <Entry Grid.Column="0"
+                   x:Name="ShortcutEntry"
+                   Text="{Binding NewShortcut}"
+                   IsReadOnly="True"
+                   HeightRequest="36"
+                   MinimumHeightRequest="0"
+                   BackgroundColor="{AppThemeBinding Light={StaticResource FieldFill}, Dark={StaticResource FieldFillDark}}"
+                   Placeholder="Click here, then press a shortcut (e.g. Ctrl+Alt+1)..." />
+            <Button Grid.Column="1"
+                    Text="Clear shortcut"
+                    VerticalOptions="Center"
+                    IsVisible="{Binding HasShortcut}"
+                    Command="{Binding ClearShortcutCommand}"
+                    Style="{StaticResource QuietButton}" />
+        </Grid>
+
+        <Label Grid.Row="3"
+               Margin="4,-2,4,0"
+               FontSize="11"
+               TextColor="{AppThemeBinding Light={StaticResource MutedText}, Dark={StaticResource MutedTextDark}}"
+               Text="Tip: Ctrl+Alt+F1-F12 are always free, and so are Ctrl+Alt+digit and Ctrl+Alt+Shift+letter on most keyboards. Combinations your own layout types with AltGr are flagged, naming the character - Windows sees AltGr as a virtual Ctrl+Alt." />
+
+        <Grid Grid.Row="4" ColumnSpacing="8" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,2,0,2">
+            <Button Grid.Column="0"
+                    Text="{Binding SaveButtonText}"
+                    Command="{Binding SaveSnippetCommand}"
+                    Style="{StaticResource ActionButton}" />
+            <Button Grid.Column="1"
+                    Text="New"
+                    IsVisible="{Binding IsEditing}"
+                    Command="{Binding ClearEditorCommand}"
+                    Style="{StaticResource QuietButton}" />
+            <Button Grid.Column="3"
+                    Text="Remove Selected"
+                    Command="{Binding RemoveSnippetCommand}"
+                    Style="{StaticResource QuietButton}" />
+        </Grid>
+
+        <Border Grid.Row="5"
+                Padding="0"
+                StrokeShape="RoundRectangle 8"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                StrokeThickness="1"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+            <CollectionView ItemsSource="{Binding Snippets}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedSnippet}">
+                <CollectionView.EmptyView>
+                    <Label Text="No snippets yet - type the text above, record a shortcut and add it."
+                           Margin="20,28"
+                           FontSize="13"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource MutedText}, Dark={StaticResource MutedTextDark}}" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SnippetModel">
+                        <!-- Right padding keeps the shortcut clear of the overlay scrollbar. -->
+                        <Grid Padding="12,7,18,7" ColumnSpacing="14" ColumnDefinitions="*,Auto,Auto">
+                            <Label Grid.Column="0"
+                                   Text="{Binding Content}"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="1"
+                                   VerticalOptions="Center" />
+
+                            <!-- A shortcut saved before the layout check, or overtaken by
+                                 a layout installed since, still eats its character. -->
+                            <Label Grid.Column="1"
+                                   Text="{Binding Warning}"
+                                   IsVisible="{Binding HasWarning}"
+                                   FontSize="12"
+                                   Margin="0,0,10,0"
+                                   VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource WarningText}, Dark={StaticResource WarningTextDark}}" />
+
+                            <Border Grid.Column="2"
+                                    Padding="8,2"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 5"
+                                    IsVisible="{Binding HasShortcut}"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}">
+                                <Label Text="{Binding Shortcut}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}" />
+                            </Border>
+
+                            <!-- Parked snippet: kept after its shortcut went to another one. -->
+                            <Label Grid.Column="2"
+                                   Text="no shortcut"
+                                   FontSize="12"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding HasNoShortcut}"
+                                   TextColor="{AppThemeBinding Light={StaticResource MutedText}, Dark={StaticResource MutedTextDark}}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+
+        <VerticalStackLayout Grid.Row="6" Spacing="8" Margin="0,2,0,0">
+            <BoxView HeightRequest="1"
+                     BackgroundColor="Transparent"
+                     Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+            <HorizontalStackLayout Spacing="8">
+                <CheckBox x:Name="AutostartCheckBox"
+                          MinimumHeightRequest="0"
+                          MinimumWidthRequest="0"
+                          VerticalOptions="Center" />
+                <Label Text="Start with Windows (hidden in tray)"
+                       FontSize="13"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
