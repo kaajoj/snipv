@@ -1,5 +1,7 @@
 # snipv
 
+[![CI](https://github.com/kaajoj/snipv/actions/workflows/ci.yml/badge.svg)](https://github.com/kaajoj/snipv/actions/workflows/ci.yml)
+
 A tiny Windows tray app for pasting text snippets anywhere with global hotkeys.
 
 ![The snipv window: a multi-line snippet with its shortcut, above the list of saved snippets](screenshot.png)

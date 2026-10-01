@@ -18,7 +18,7 @@ namespace snipv
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             builder.Services.AddSingleton<NativeWindowHook>();
