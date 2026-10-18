@@ -4,6 +4,8 @@
 
 A tiny Windows tray app for pasting text snippets anywhere with global hotkeys.
 
+**Download:** [latest release](https://github.com/kaajoj/snipv/releases/latest)
+
 ![The snipv window: a multi-line snippet with its shortcut, above the list of saved snippets](screenshot.png)
 
 Define a snippet, record a shortcut for it, and from then on pressing that
