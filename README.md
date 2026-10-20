@@ -84,6 +84,10 @@ The name is `snip` + **V**, as in Ctrl+**V** - the shortcut it presses for you.
   manual Ctrl+V works.
 - Pasting goes through the clipboard and the snippet intentionally stays there
   afterwards (no clipboard restore).
+- No text expansion (typing a trigger such as `!tel` to get a snippet): it
+  needs a keyboard hook that sees every keystroke system-wide, a privacy cost
+  snipv does not pay for now. The idea and its design notes are parked in
+  [BACKLOG.md](BACKLOG.md).
 
 ## Recommended shortcut pools
 
